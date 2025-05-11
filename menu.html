@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Menu Toko</title>
+  <style>
+    body {
+      font-family: monospace;
+      background: #111;
+      color: #0f0;
+      padding: 20px;
+    }
+    input, button {
+      margin-top: 10px;
+      padding: 5px;
+      font-family: monospace;
+    }
+    .output {
+      margin-top: 20px;
+      white-space: pre;
+    }
+  </style>
+</head>
+<body>
+  <h2>&lt;              nama toko             &gt;</h2>
+  <h3>&lt;----------------MENU----------------&gt;</h3>
+  <div>
+    &lt;----1-------chikenjhokey------------&gt;<br>
+    &lt;----2-------burgersigma-------------&gt;<br>
+    &lt;----3-------pizzaauuuuu-------------&gt;<br>
+    &lt;----4-------mieayamlejat------------&gt;<br>
+    &lt;----5-------baksow------------------&gt;
+  </div>
+
+  <p>ISI SESUAI DENGAN MENU YG ANDA PILIH!!</p>
+
+  <label>Pilih menu: </label>
+  <input type="text" id="menuInput"><br>
+  <label>Jumlah: </label>
+  <input type="number" id="jumlahInput"><br>
+  <button onclick="hitung()">Pesan</button>
+
+  <div class="output" id="output"></div>
+
+  <script>
+    function hitung() {
+      const menu = document.getElementById("menuInput").value.toLowerCase();
+      const jumlah = parseInt(document.getElementById("jumlahInput").value);
+      const output = document.getElementById("output");
+      let harga = 0;
+      let total = 0;
+      let pesan = "";
+
+      if (isNaN(jumlah) && menu !== "rahasia") {
+        output.innerText = "Input harus angka bukan selain itu";
+        return;
+      }
+
+      switch(menu) {
+        case "chikenjhokey":
+          harga = 20000;
+          break;
+        case "burgersigma":
+          harga = 25000;
+          break;
+        case "pizzaauuuuu":
+          harga = 35000;
+          break;
+        case "mieayamlejat":
+          harga = 7000;
+          break;
+        case "baksow":
+          harga = 7000;
+          break;
+        case "rahasia":
+          pesan = "nice code\npaket: semua\nharga: Rp.0";
+          output.innerText = pesan;
+          return;
+        default:
+          output.innerText = "Menu tidak ditemukan / salah ketik.";
+          return;
+      }
+
+      total = harga * jumlah;
+      pesan = `harga: Rp.${harga}\ntotal harga: Rp.${total}`;
+      output.innerText = pesan;
+    }
+  </script>
+</body>
+</html>
