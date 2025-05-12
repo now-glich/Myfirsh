@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>new era</title>
+    <style>
+        canvas { background: #111; display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="480" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Paddle
+        const paddleWidth = 100, paddleHeight = 15;
+        let paddleX = (canvas.width - paddleWidth) / 2;
+
+        // Ball
+        const ballRadius = 10;
+        let ballX = canvas.width / 2, ballY = canvas.height - 30;
+        let ballDX = 4, ballDY = -4;
+
+        // Blocks
+        const blockRowCount = 5, blockColCount = 8;
+        const blockWidth = 60, blockHeight = 20;
+        const blockPadding = 10, blockOffsetTop = 50;
+        let blocks = [];
+        
+        for (let r = 0; r < blockRowCount; r++) {
+            blocks[r] = [];
+            for (let c = 0; c < blockColCount; c++) {
+                blocks[r][c] = { x: 0, y: 0, status: 1 };
+            }
+        }
+
+        // Controls
+        let rightPressed = false, leftPressed = false;
+        document.addEventListener("keydown", keyDownHandler);
+        document.addEventListener("keyup", keyUpHandler);
+
+        function keyDownHandler(e) {
+            if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
+            else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
+        }
+        function keyUpHandler(e) {
+            if (e.key === "Right" || e.key === "ArrowRight") rightPressed = false;
+            else if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = false;
+        }
+
+        // Collision Detection
+        function collisionDetection() {
+            for (let r = 0; r < blockRowCount; r++) {
+                for (let c = 0; c < blockColCount; c++) {
+                    const block = blocks[r][c];
+                    if (block.status && 
+                        ballX > block.x && ballX < block.x + blockWidth &&
+                        ballY > block.y && ballY < block.y + blockHeight) {
+                        ballDY = -ballDY;
+                        block.status = 0;
+                    }
+                }
+            }
+        }
+
+        // Draw Everything
+        function draw() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw blocks
+            for (let r = 0; r < blockRowCount; r++) {
+                for (let c = 0; c < blockColCount; c++) {
+                    if (blocks[r][c].status) {
+                        const blockX = c * (blockWidth + blockPadding) + blockOffsetTop;
+                        const blockY = r * (blockHeight + blockPadding) + blockOffsetTop;
+                        blocks[r][c].x = blockX;
+                        blocks[r][c].y = blockY;
+                        ctx.fillStyle = "#" + Math.floor(Math.random() * 16777215).toString(16);
+                        ctx.fillRect(blockX, blockY, blockWidth, blockHeight);
+                    }
+                }
+            }
+
+            // Draw paddle
+            ctx.fillStyle = "#0095DD";
+            ctx.fillRect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+
+            // Draw ball
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+            ctx.fillStyle = "#FF0000";
+            ctx.fill();
+            ctx.closePath();
+
+            // Move paddle
+            if (rightPressed && paddleX < canvas.width - paddleWidth) paddleX += 7;
+            else if (leftPressed && paddleX > 0) paddleX -= 7;
+
+            // Move ball
+            ballX += ballDX;
+            ballY += ballDY;
+
+            // Wall collision
+            if (ballX + ballDX > canvas.width - ballRadius || ballX + ballDX < ballRadius) ballDX = -ballDX;
+            if (ballY + ballDY < ballRadius) ballDY = -ballDY;
+            else if (ballY + ballDY > canvas.height - ballRadius) {
+                if (ballX > paddleX && ballX < paddleX + paddleWidth) ballDY = -ballDY;
+                else {
+                    alert("Game Over!");
+                    document.location.reload();
+                }
+            }
+
+            // Check block collisions
+            collisionDetection();
+
+            requestAnimationFrame(draw);
+        }
+        draw();
+    </script>
+</body>
+</html>
