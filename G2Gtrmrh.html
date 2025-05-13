@@ -19,6 +19,23 @@
       text-align: center;
     }
 
+    /* Mengubah gaya tombol agar lebih besar */
+    button {
+      font-size: 20px; /* Menambah ukuran font */
+      padding: 20px 40px; /* Menambah padding agar tombol lebih besar */
+      background-color: #4CAF50; /* Memberikan warna latar belakang hijau */
+      color: white; /* Mengubah warna teks menjadi putih */
+      border: none; /* Menghilangkan border default */
+      border-radius: 10px; /* Memberikan sudut melengkung pada tombol */
+      cursor: pointer; /* Menampilkan cursor pointer saat hover */
+      transition: background-color 0.3s; /* Animasi perubahan warna saat hover */
+    }
+
+    /* Mengubah warna tombol saat di-hover */
+    button:hover {
+      background-color: #45a049;
+    }
+
     /* Container video yang muncul */
     #videoContainer {
       display: none;
@@ -28,9 +45,7 @@
   </style>
 </head>
 <body>
-  <title>Izinkan Cache</title>
-  <title>silakan klik tombol di bawah untuk mengizinkan cache Anda.</title>
-  <button onclick="mintaLokasi()">Izinkan Sekarang</button>
+  <button onclick="mintaLokasi()">lihat promo disini</button>
 
   <div id="videoContainer">
     <video width="320" height="240" controls autoplay>
