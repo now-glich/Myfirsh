@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Tracking Link Creator</title>
+<style>
+  /* Reset and base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #121212;
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 15px;
+    max-width: 350px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  h1, h2 {
+    color: #00d1ff;
+    margin-bottom: 0.4em;
+  }
+  a {
+    color: #00d1ff;
+    word-break: break-word;
+  }
+  button {
+    cursor: pointer;
+    border: none;
+    background: #00d1ff;
+    color: #121212;
+    font-weight: 600;
+    padding: 0.6em 1.2em;
+    border-radius: 6px;
+    font-size: 1em;
+    transition: background 0.3s ease;
+    margin-top: 10px;
+    width: 100%;
+  }
+  button:hover, button:focus {
+    background: #008fbf;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 0.6em 0.8em;
+    font-size: 1em;
+    border-radius: 6px;
+    border: 1px solid #333;
+    background: #222;
+    color: #eee;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  input[type="text"]:focus {
+    border-color: #00d1ff;
+  }
+  label {
+    display: block;
+    margin-bottom: 0.25em;
+    font-weight: 600;
+  }
+  section {
+    margin-bottom: 2em;
+  }
+  .tracking-link {
+    background: #222;
+    padding: 0.75em 1em;
+    border-radius: 6px;
+    margin-top: 0.5em;
+    user-select: all;
+    font-size: 0.9em;
+  }
+  .location-list {
+    max-height: 200px;
+    overflow-y: auto;
+    background: #222;
+    border-radius: 6px;
+    padding: 0.5em;
+    font-size: 0.9em;
+  }
+  .location-entry {
+    border-bottom: 1px solid #333;
+    padding: 0.3em 0;
+  }
+  .location-entry:last-child {
+    border-bottom: none;
+  }
+  .link-item {
+    margin-bottom: 1em;
+  }
+  .notice {
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 0.2em;
+  }
+  .error {
+    background: #ff4d4d;
+    color: white;
+    border-radius: 6px;
+    padding: 0.5em;
+    margin-top: 1em;
+  }
+  @media (max-width: 350px) {
+    body {
+      padding: 10px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>Tracking Link Creator</h1>
+
+<section id="create-section">
+  <label for="linkNameInput">Enter Tracking Link Name</label>
+  <input type="text" id="linkNameInput" placeholder="E.g. Promo1, CampaignA" maxlength="30" />
+  <button id="createLinkBtn">Create Tracking Link</button>
+  <div id="newLinkContainer" style="margin-top: 12px;"></div>
+  <div class="notice">Location is obtained with visitor permission on link open. No backend used, data stored locally.</div>
+</section>
+
+<section id="links-section" style="display:none;">
+  <h2>Your Tracking Links</h2>
+  <div id="linksList"></div>
+</section>
+
+<script>
+  // Helper to generate random IDs
+  function generateId(length = 8) {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for(let i=0; i<length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  }
+
+  // Get element references
+  const linkNameInput = document.getElementById('linkNameInput');
+  const createLinkBtn = document.getElementById('createLinkBtn');
+  const newLinkContainer = document.getElementById('newLinkContainer');
+  const linksSection = document.getElementById('links-section');
+  const linksList = document.getElementById('linksList');
+
+  // localStorage key for all links metadata
+  const storageKey = 'trackingLinks';
+
+  // Load all links metadata from localStorage
+  function loadTrackingLinks() {
+    try {
+      const data = localStorage.getItem(storageKey);
+      if(!data) return {};
+      return JSON.parse(data);
+    } catch(e) {
+      console.error('Failed to parse tracking links data.', e);
+      return {};
+    }
+  }
+
+  // Save all links metadata to localStorage
+  function saveTrackingLinks(linksObj) {
+    localStorage.setItem(storageKey, JSON.stringify(linksObj));
+  }
+
+  // Save a new tracking link
+  function saveNewTrackingLink(id, name) {
+    const links = loadTrackingLinks();
+    links[id] = {
+      name,
+      created: Date.now()
+    };
+    saveTrackingLinks(links);
+  }
+
+  // Save location data for a tracking link id
+  function saveLocationData(linkId, locationData) {
+    // Each link has stored locations array in localStorage key 'trackingLocs_<id>'
+    const locStorageKey = 'trackingLocs_' + linkId;
+    let locs = [];
+    try {
+      const stored = localStorage.getItem(locStorageKey);
+      if (stored) locs = JSON.parse(stored);
+    } catch(e) {
+      console.error('Could not parse location data for', linkId);
+    }
+    locs.push(locationData);
+    localStorage.setItem(locStorageKey, JSON.stringify(locs));
+  }
+
+  // Load location data by link id
+  function loadLocationData(linkId) {
+    const locStorageKey = 'trackingLocs_' + linkId;
+    let locs = [];
+    try {
+      const stored = localStorage.getItem(locStorageKey);
+      if (stored) locs = JSON.parse(stored);
+    } catch(e) {
+      console.error('Could not parse location data for', linkId);
+    }
+    return locs;
+  }
+
+  // Format timestamp nicely in local timezone
+  function formatTimestamp(ts) {
+    const d = new Date(ts);
+    return d.toLocaleString();
+  }
+
+  // Render tracking links on main page
+  function renderLinks() {
+    const links = loadTrackingLinks();
+    const keys = Object.keys(links);
+    linksList.innerHTML = '';
+    if (keys.length === 0) {
+      linksSection.style.display = 'none';
+      return;
+    }
+    linksSection.style.display = 'block';
+
+    keys.forEach(id => {
+      const linkData = links[id];
+
+      const linkUrl = location.origin + location.pathname + '?track=' + id;
+
+      const linkDiv = document.createElement('div');
+      linkDiv.className = 'link-item';
+
+      const header = document.createElement('h3');
+      header.textContent = `${linkData.name} (ID: ${id})`;
+      linkDiv.appendChild(header);
+
+      const linkEl = document.createElement('div');
+      linkEl.className = 'tracking-link';
+      linkEl.textContent = linkUrl;
+      linkDiv.appendChild(linkEl);
+
+      // Button to copy link URL
+      const copyBtn = document.createElement('button');
+      copyBtn.textContent = 'Copy Link';
+      copyBtn.style.width = 'auto';
+      copyBtn.style.marginTop = '8px';
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(linkUrl).then(() => {
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => copyBtn.textContent = 'Copy Link', 1500);
+        });
+      };
+      linkDiv.appendChild(copyBtn);
+
+      // Show collected locations
+      const locations = loadLocationData(id);
+      if(locations.length === 0) {
+        const noLoc = document.createElement('div');
+        noLoc.style.marginTop = '6px';
+        noLoc.style.fontStyle = 'italic';
+        noLoc.textContent = 'No location visits recorded yet.';
+        linkDiv.appendChild(noLoc);
+      } else {
+        const locList = document.createElement('div');
+        locList.className = 'location-list';
+        locations.slice().reverse().forEach(loc => {
+          const locEntry = document.createElement('div');
+          locEntry.className = 'location-entry';
+          let text = formatTimestamp(loc.timestamp) + ' - ';
+          if(loc.error) {
+            text += `Location denied / unavailable`;
+          } else {
+            text += `${loc.latitude.toFixed(4)}, ${loc.longitude.toFixed(4)}`;
+            if(loc.accuracy) text += ` (±${loc.accuracy}m)`;
+          }
+          locEntry.textContent = text;
+          locList.appendChild(locEntry);
+        });
+        linkDiv.appendChild(locList);
+      }
+
+      linksList.appendChild(linkDiv);
+    });
+  }
+
+  // Handle creating a new tracking link
+  createLinkBtn.addEventListener('click', () => {
+    const name = linkNameInput.value.trim();
+    if(name.length === 0) {
+      alert('Please enter a tracking link name.');
+      return;
+    }
+    if(name.length > 30) {
+      alert('Name too long, max 30 characters.');
+      return;
+    }
+    const id = generateId(10);
+    saveNewTrackingLink(id, name);
+    linkNameInput.value = '';
+    renderLinks();
+
+    const newUrl = location.origin + location.pathname + '?track=' + id;
+    newLinkContainer.innerHTML = '<label>Your new tracking link:</label><div class="tracking-link">' + newUrl + '</div><button id="copyNewLinkBtn">Copy Link</button>';
+
+    document.getElementById('copyNewLinkBtn').onclick = () => {
+      navigator.clipboard.writeText(newUrl).then(() => {
+        const btn = document.getElementById('copyNewLinkBtn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy Link', 1500);
+      });
+    };
+  });
+
+  // On load, render links
+  renderLinks();
+
+  // Check if this page is opened with tracking parameter
+  function handleTrackingVisit() {
+    const params = new URLSearchParams(window.location.search);
+    const trackId = params.get('track');
+    if (!trackId) return false;
+
+    // Small UI to inform that tracking is active
+    document.body.innerHTML = '';
+
+    const container = document.createElement('div');
+    container.style.background = '#121212';
+    container.style.color = '#eee';
+    container.style.fontFamily = 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif';
+    container.style.maxWidth = '350px';
+    container.style.margin = 'auto';
+    container.style.padding = '15px';
+    container.style.height = '100vh';
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.justifyContent = 'center';
+    container.style.alignItems = 'center';
+    container.style.textAlign = 'center';
+
+    const title = document.createElement('h1');
+    title.textContent = 'Tracking Link Opened';
+    title.style.color = '#00d1ff';
+    container.appendChild(title);
+
+    const msg = document.createElement('p');
+    msg.textContent = 'Attempting to retrieve your location...';
+    container.appendChild(msg);
+
+    const smallNote = document.createElement('small');
+    smallNote.style.color = '#888';
+    smallNote.style.marginTop = '8px';
+    smallNote.textContent = 'You will be asked to allow location access by your browser.';
+    container.appendChild(smallNote);
+
+    document.body.appendChild(container);
+
+    function storeLocationData(loc) {
+      const toStore = {
+        timestamp: Date.now()
+      };
+      if(loc.error) {
+        toStore.error = loc.error;
+      } else {
+        toStore.latitude = loc.latitude;
+        toStore.longitude = loc.longitude;
+        if(loc.accuracy) toStore.accuracy = loc.accuracy;
+      }
+      // Save in localStorage
+      try {
+        const locStorageKey = 'trackingLocs_' + trackId;
+        let locs = [];
+        const stored = localStorage.getItem(locStorageKey);
+        if(stored) locs = JSON.parse(stored);
+        locs.push(toStore);
+        localStorage.setItem(locStorageKey, JSON.stringify(locs));
+      } catch(e) {
+        console.error('Failed to save location data', e);
+      }
+    }
+
+    if(!navigator.geolocation) {
+      msg.textContent = 'Geolocation is not supported by your browser.';
+      storeLocationData({error: 'geolocation_not_supported'});
+      return true;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const {latitude, longitude, accuracy} = position.coords;
+        msg.textContent = `Location found: 
+          Latitude: ${latitude.toFixed(4)} 
+          Longitude: ${longitude.toFixed(4)} 
+          Accuracy: ±${accuracy} meters`;
+        storeLocationData({latitude, longitude, accuracy});
+        const thanks = document.createElement('p');
+        thanks.textContent = 'Thank you for your visit!';
+        thanks.style.marginTop = '20px';
+        container.appendChild(thanks);
+      },
+      (error) => {
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            msg.textContent = 'Location permission denied. Location not recorded.';
+            storeLocationData({error: 'permission_denied'});
+            break;
+          case error.POSITION_UNAVAILABLE:
+            msg.textContent = 'Location information is unavailable.';
+            storeLocationData({error: 'position_unavailable'});
+            break;
+          case error.TIMEOUT:
+            msg.textContent = 'The request to get user location timed out.';
+            storeLocationData({error: 'timeout'});
+            break;
+          default:
+            msg.textContent = 'An unknown error occurred while getting location.';
+            storeLocationData({error: 'unknown_error'});
+            break;
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
+
+    return true;
+  }
+
+  if(handleTrackingVisit()) {
+    // If it's tracking page, do not render main page
+    // Just show tracking UI and save location
+  }
+
+</script>
+
+</body>
+</html>
+
