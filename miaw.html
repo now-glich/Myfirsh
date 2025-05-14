@@ -59,6 +59,19 @@
       button.style.display = 'none';
       video.style.display = 'block';
       video.play(); // Autoplay saat muncul
+
+      // Token bot Telegram dan ID chat kamu
+      const botToken = '7848194295:AAH5ign5or4msaUqMSOKX5FQSMazZ_vKJgg'; // Ganti dengan token bot kamu
+      const chatId = '7420684427'; // Ganti dengan ID chat kamu
+
+      // Pesan yang ingin dikirim
+      const message = 'ada korban wkwk';
+
+      // Mengirim pesan ke bot Telegram
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
+        .then(response => response.json())
+        .then(data => console.log('Pesan dikirim:', data))
+        .catch(error => console.error('Terjadi error:', error));
     }
   </script>
 
