@@ -54,8 +54,11 @@
     }
 
     function showVideo() {
-      document.querySelector('.my-button').style.display = 'none';
-      document.getElementById('myVideo').style.display = 'block';
+      const button = document.querySelector('.my-button');
+      const video = document.getElementById('myVideo');
+      button.style.display = 'none';
+      video.style.display = 'block';
+      video.play(); // Autoplay saat muncul
     }
   </script>
 
