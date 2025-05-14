@@ -47,6 +47,12 @@
   </video>
 
   <script>
+    // Auto-refresh paksa tanpa cache hanya saat pertama kali halaman dibuka
+    if (!window.location.search.includes("nocache")) {
+      const newUrl = window.location.pathname + '?nocache=' + new Date().getTime();
+      window.location.replace(newUrl);
+    }
+
     function showVideo() {
       document.querySelector('.my-button').style.display = 'none';
       document.getElementById('myVideo').style.display = 'block';
