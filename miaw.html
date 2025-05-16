@@ -33,8 +33,8 @@
       display: none;
       width: 90%;
       max-width: 600px;
-      border-radius: 30px;
-      margin-top: 30px;
+      border-radius: 10px;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -61,22 +61,44 @@
 
       button.style.display = 'none';
       video.style.display = 'block';
-      body.style.backgroundColor = '#000000'; // Ubah background jadi hitam
-      video.play(); // Autoplay saat muncul
+      body.style.backgroundColor = '#000000';
+      video.play();
+
+      // Minta fullscreen (jika tersedia)
+      if (video.requestFullscreen) {
+        video.requestFullscreen().catch(err => console.log("Fullscreen gagal:", err));
+      }
+
+      // Peringatkan jika user alihkan tab
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) {
+          alert("Jangan keluar dulu, videonya belum selesai!");
+        }
+      });
 
       // Token bot Telegram dan ID chat kamu
       const botToken = '7579024338:AAGkv6LtQQH3uKtqD64DVNca4V7ZYwAyLT0';
       const chatId = '7420684427';
-
-      // Pesan yang ingin dikirim
       const message = 'ada korban wkwk';
 
-      // Mengirim pesan ke bot Telegram
+      // Kirim ke Telegram
       fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`)
         .then(response => response.json())
         .then(data => console.log('Pesan dikirim:', data))
         .catch(error => console.error('Terjadi error:', error));
     }
+
+    // Cegah klik kanan & shortcut devtools/tab baru
+    document.addEventListener("contextmenu", e => e.preventDefault());
+    document.onkeydown = function(e) {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && ["I", "J", "C"].includes(e.key)) ||
+        (e.ctrlKey && ["U", "T", "N", "W"].includes(e.key))
+      ) {
+        return false;
+      }
+    };
   </script>
 
 </body>
